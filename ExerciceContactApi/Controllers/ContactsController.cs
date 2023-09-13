@@ -51,7 +51,7 @@ namespace ExerciceContactApi.Controllers
         {
             var contacts = _contactRepository.GetByFirstname(str);
             if (!contacts!.Any())
-                return NoContent();
+                return NotFound("Pas de correspondance trouvé.");
             return Ok(contacts);
         }
 
@@ -62,12 +62,12 @@ namespace ExerciceContactApi.Controllers
         {
             if (id != contact.Id)
             {
-                return BadRequest();
+                return BadRequest("Ce n'est pas le bon Id");
             }
 
             if (_contactRepository.Put(contact))
                 return Ok(contact);
-            return NotFound();
+            return BadRequest("la requête envoyé n'est pas bonne");
         }
 
         [HttpPost]
@@ -77,15 +77,14 @@ namespace ExerciceContactApi.Controllers
             {
                 Lastname = createContact.Lastname,
                 Firstname = createContact.Firstname,
-                Fullname = createContact.Fullname,
                 Birthdate = createContact.Birthdate,
-                Sexe = createContact.Sexe,
+                Gender = createContact.Gender,
                 Avatar = createContact.Avatar
             };
 
             if (!_contactRepository.Post(contact))
             {
-                return Problem("Error Contact not Added");
+                return Problem("Erreur. Le contact n'a pas pu être ajouté.");
             }
 
             return CreatedAtAction("GetContact", new { id = contact.Id }, contact);
@@ -96,8 +95,8 @@ namespace ExerciceContactApi.Controllers
         public IActionResult DeleteContact(int id)
         {
             if (_contactRepository.Delete(id))
-                return NoContent();
-            return NotFound();
+                return Ok("Le contact a bien été supprimer");
+            return BadRequest("Erreur. Le contact n'a pas pu être supprimer");
         }
     }
 }
